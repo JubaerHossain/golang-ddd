@@ -13,7 +13,7 @@ func SetupUserRoutes(cacheService cache.CacheService) *http.ServeMux {
 	// Register user routes
 	router.HandleFunc("/users", GetUsers)
 	// router.HandleFunc("/user/{id}", GetUserByID).Methods("GET")
-	// router.HandleFunc("/user", SaveUser).Methods("POST")
+	router.HandleFunc("/user", CreateUser)
 	// router.HandleFunc("/user/{id}", UpdateUser).Methods("PUT")
 	// router.HandleFunc("/user/{id}", DeleteUser).Methods("DELETE")
 

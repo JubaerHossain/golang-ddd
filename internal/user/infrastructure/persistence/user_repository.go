@@ -71,7 +71,27 @@ func (r *UserRepositoryImpl) DeleteUser(userID uint) error {
 	return nil
 }
 
-func FilterUsers(queryValues map[string][]string) (users []*entity.User, err error) {
+func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) (users []*entity.User, err error) {
 	// Implement logic to filter users
+	// Example: filter users by name
+	query := r.db.Model(&entity.User{})
+	if name, ok := queryValues["name"]; ok {
+		query = query.Where("name = ?", name[0])
+	}
+	if email, ok := queryValues["email"]; ok {
+		query = query.Where("email = ?", email[0])
+	}
+	if status := queryValues["status"]; len(status) > 0 {
+		query = query.Where("status = ?", status[0])
+	}
+	if role := queryValues["role"]; len(role) > 0 {
+		query = query.Where("role = ?", role[0])
+	}
+	if date := queryValues["date"]; len(date) > 0 {
+		query = query.Where("created_at = ?", date[0])
+	}
+	if err := query.Find(&users).Error; err != nil {
+		return nil, err
+	}
 	return users, nil
 }

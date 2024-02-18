@@ -24,7 +24,7 @@ func GetUsers(ctx context.Context) ([]*entity.User, error) {
 }
 
 // CreateUser creates a new user
-func CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
+func CreateUser(user *entity.User) (*entity.User, error) {
 	// Add any validation or business logic here before creating the user
 
 	repo, err := persistence.NewUserRepository()

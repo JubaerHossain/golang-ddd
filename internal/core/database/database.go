@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -56,7 +57,7 @@ func ConnectDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to ping database after multiple attempts: %w", err)
 	}
-	
+
 	defer func() {
 		dbInstance, _ := db.DB()
 		_ = dbInstance.Close()
@@ -72,7 +73,7 @@ func MigrateDB(db *gorm.DB) error {
 	// Add your database migration logic here
 	// For example:
 	if err := db.AutoMigrate(
-	// Add your model structs here
+		&entity.User{},
 	); err != nil {
 		return fmt.Errorf("failed to perform database migrations: %w", err)
 	}

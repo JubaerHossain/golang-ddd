@@ -35,3 +35,15 @@ func WriteJSONError(w http.ResponseWriter, statusCode int, message string) {
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(response)
 }
+
+func WriteJSONEValidation(w http.ResponseWriter, statusCode int, errors interface{}) {
+	response := Response{
+		Success: false,
+		Message: "Validation error",
+		Data:    errors,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(response)
+}

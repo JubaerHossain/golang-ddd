@@ -39,12 +39,14 @@ func (s *Server) Start() error {
 	}
 
 	// Initialize database connection
-	_, err := database.ConnectDB()
+	db, err := database.ConnectDB()
 	if err != nil {
 		logger.Error("Failed to connect to database", zap.Error(err))
 		return err
 	}
-	
+	if  os.Getenv("MIGRATE") == "true" {
+		database.MigrateDB(db)	
+	}
 
 	// Initialize Redis cache service
 	ctx := context.Background()

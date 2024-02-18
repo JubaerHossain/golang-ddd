@@ -25,6 +25,9 @@ type RedisCacheService struct {
 // NewRedisCacheService creates a new instance of RedisCacheService
 func NewRedisCacheService(ctx context.Context) (*RedisCacheService, error) {
 	// Get Redis server address and password from environment variables
+	if os.Getenv("IS_REDIS") != "true" {
+		return nil, nil		
+	}
 	redisURI := os.Getenv("REDIS_URI")
 	if redisURI == "" {
 		redisURI = "localhost:6379" // Default Redis server address
