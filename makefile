@@ -1,5 +1,4 @@
-.PHONY: proto
-proto:
-	@./scripts/proto.sh trainer
+install:
+	go mod tidy
 dev:
 	go run ./cmd/server/server.go
