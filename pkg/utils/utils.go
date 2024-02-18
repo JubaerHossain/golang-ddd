@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -12,6 +13,12 @@ type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
+}
+
+type ErrorResponse struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message,omitempty"`
+	Errors  interface{} `json:"errors,omitempty"`
 }
 
 // WriteJSONResponse writes a JSON response with the specified status code.
@@ -38,16 +45,17 @@ func WriteJSONError(w http.ResponseWriter, statusCode int, message string) {
 	json.NewEncoder(w).Encode(response)
 }
 
-
 func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface{}) {
 	errors := make(map[string]string)
 	for _, err := range error.(validator.ValidationErrors) {
-		errors[err.Field()] = err.Field() + " is " + err.Tag()
+		if strings.ToLower(err.Field()) != ""{			
+			errors[strings.ToLower(err.Field())] = err.Field() + " is " + err.Tag()
+		}
 	}
-	response := Response{
+	response := ErrorResponse{
 		Success: false,
 		Message: "Validation error",
-		Data:    errors,
+		Errors:  errors,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
