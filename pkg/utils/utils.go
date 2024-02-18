@@ -3,6 +3,8 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // Response represents a standardized JSON response format.
@@ -36,7 +38,12 @@ func WriteJSONError(w http.ResponseWriter, statusCode int, message string) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func WriteJSONEValidation(w http.ResponseWriter, statusCode int, errors interface{}) {
+
+func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface{}) {
+	errors := make(map[string]string)
+	for _, err := range error.(validator.ValidationErrors) {
+		errors[err.Field()] = err.Field() + " is " + err.Tag()
+	}
 	response := Response{
 		Success: false,
 		Message: "Validation error",

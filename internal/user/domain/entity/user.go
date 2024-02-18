@@ -1,10 +1,5 @@
 package entity
 
-import (
-	"bytes"
-	"strings"
-)
-
 // Status represents the status of a user
 type Status string
 
@@ -41,26 +36,4 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Status    Status `json:"status" gorm:"default:pending" validate:"required,oneof=active inactive deleted pending"`
-}
-
-func (u *User) Validate() string {
-    var errMsg bytes.Buffer
-
-    if u.Username == "" {
-        errMsg.WriteString("Username is required\n")
-    }
-    if u.Email == "" {
-        errMsg.WriteString("Email is required\n")
-    }
-    if u.Password == "" {
-        errMsg.WriteString("Password is required\n")
-    }
-    if u.Role == "" {
-        errMsg.WriteString("Role is required\n")
-    }
-    if u.Status == "" {
-        errMsg.WriteString("Status is required\n")
-    }
-
-    return strings.TrimSpace(errMsg.String())
 }

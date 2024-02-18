@@ -2,7 +2,6 @@ package userhttp
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -34,6 +33,20 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type ApiError struct {
+	Field string `json:"field"`
+	Error string `json:"error"`
+}
+
+func msgForTag(tag string) string {
+	switch tag {
+	case "required":
+		return "Field is required"
+	// Add more custom error messages as needed
+	default:
+		return "Invalid value"
+	}
+}
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.WriteJSONError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -53,20 +66,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("newUser", newUser)
 	validate := validator.New()
 	err3 := validate.Struct(newUser)
-	fmt.Println(err3)
-
-	// errors := newUser.Validate()
-	// if len(errors) > 0 {
-	// 	// Write validation errors as response
-	// 	utils.WriteJSONError(w, http.StatusBadRequest, errors)
-	// 	return
-	// }
-
-	// if err := newUser.Validate(); err != nil {
-	// 	errors := err.(validator.ValidationErrors)
-	// 	utils.WriteJSONEValidation(w, http.StatusBadRequest, errors)
-	// 	return
-	// }
+	if err3 != nil {
+		utils.WriteJSONEValidation(w, http.StatusBadRequest, err3.(validator.ValidationErrors))
+		return
+	}
 
 	// Call the CreateUser function to create the user
 	user, err := application.CreateUser(&newUser)
