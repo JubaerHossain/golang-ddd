@@ -26,3 +26,82 @@ make build
 make run
 ```
 
+## Features
+- [x] Golang
+- [x] DDD
+- [x] Clean Architecture
+- [x] Docker
+- [x] Makefile
+- [x] Swagger
+- [x] Gorm
+- [x] JWT
+- [x] Viper
+- [x] Logger[Zap]
+- [x] Unit Test
+
+## Project Structure
+```bash
+.
+├── app
+│   ├── config
+│   │   └── config.go
+│   ├── domain
+│   │   ├── model
+│   │   │   └── user.go
+│   │   └── repository
+│   │       └── user.go
+│   ├── infrastructure
+│   │   ├── database
+│   │   │   └── database.go
+│   │   ├── logger
+│   │   │   └── logger.go
+│   │   ├── router
+│   │   │   └── router.go
+│   │   └── security
+│   │       └── security.go
+│   ├── interfaces
+│   │   ├── controller
+│   │   │   └── user.go
+│   │   ├── middleware
+│   │   │   └── middleware.go
+│   │   └── response
+│   │       └── response.go
+│   └── main.go
+├── Dockerfile
+├── go.mod
+├── go.sum
+├── Makefile
+├── README.md
+└── swagger
+    └── swagger.yaml
+```
+
+## API Endpoints
+```bash
+GET /api/v1/users
+POST /api/v1/users
+GET /api/v1/users/{id}
+PUT /api/v1/users/{id}
+DELETE /api/v1/users/{id}
+```
+
+## Health Check
+```bash
+http://localhost:8080/health
+```
+
+## Metrics
+```bash
+http://localhost:8080/metrics
+```
+
+## Swagger
+```bash
+http://localhost:8080/swagger/index.html
+```
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+```
+
+
