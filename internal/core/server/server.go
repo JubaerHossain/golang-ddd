@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/JubaerHossain/golang-ddd/internal/core/cache"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/core/middleware"
 	"github.com/joho/godotenv"
@@ -18,6 +19,7 @@ import (
 // Server represents the HTTP server
 type Server struct {
 	httpServer *http.Server
+	cache      cache.CacheService // Include cache service
 }
 
 // NewServer creates a new instance of the Server
@@ -34,6 +36,15 @@ func (s *Server) Start() error {
 	if err := godotenv.Load(); err != nil {
 		logger.Error("Error loading .env file", zap.Error(err))
 	}
+
+	// Initialize Redis cache service
+	ctx := context.Background()
+	cacheService, err := cache.NewRedisCacheService(ctx)
+	if err != nil {
+		logger.Error("Failed to initialize Redis cache service", zap.Error(err))
+		return err
+	}
+	s.cache = cacheService
 
 	// Get server address from environment variable
 	port := os.Getenv("PORT")
