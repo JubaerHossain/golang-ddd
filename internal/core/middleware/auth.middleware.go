@@ -1,8 +1,11 @@
 package middleware
 
 import (
-    "net/http"
-    "wild-workouts-go-ddd-example/internal/core/logger"
+	"net/http"
+	"time"
+
+	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
+	"go.uber.org/zap"
 )
 
 func JWTAuthorizationMiddleware(next http.Handler) http.Handler {
@@ -12,7 +15,13 @@ func JWTAuthorizationMiddleware(next http.Handler) http.Handler {
 
         // If authorization fails, return unauthorized status
         // Otherwise, proceed to the next handler
-        logger.Log("JWT authorization check")
+        
         next.ServeHTTP(w, r)
+		start := time.Now()
+		logger.Info("Request handled",
+            zap.String("method", r.Method),
+            zap.String("url", r.URL.Path),
+            zap.Duration("duration", time.Since(start)),
+        )
     })
 }

@@ -1,10 +1,13 @@
+// File: wild-workouts-go-ddd-example/internal/core/middleware/logging.go
+
 package middleware
 
 import (
-    "fmt"
-    "net/http"
-    "time"
-    "wild-workouts-go-ddd-example/internal/core/logger"
+	"net/http"
+	"time"
+
+	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
+	"go.uber.org/zap"
 )
 
 func LoggingMiddleware(next http.Handler) http.Handler {
@@ -15,11 +18,10 @@ func LoggingMiddleware(next http.Handler) http.Handler {
         next.ServeHTTP(w, r)
 
         // Log request details after handling
-        logger.Log(fmt.Sprintf(
-            "Method: %s, URL: %s, Duration: %s",
-            r.Method,
-            r.URL.Path,
-            time.Since(start),
-        ))
+        logger.Info("Request handled",
+            zap.String("method", r.Method),
+            zap.String("url", r.URL.Path),
+            zap.Duration("duration", time.Since(start)),
+        )
     })
 }

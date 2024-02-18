@@ -1,68 +1,76 @@
 package server
 
 import (
-    "fmt"
-    "net/http"
-    "github.com/JubaerHossain/golang-ddd/internal/core/middleware"
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
+	"github.com/JubaerHossain/golang-ddd/internal/core/middleware"
+	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
+// Server represents the HTTP server
 type Server struct {
-    httpServer      *http.Server
-    publicMux       *http.ServeMux
-    authorizedMux   *http.ServeMux
+	httpServer *http.Server
 }
 
+// NewServer creates a new instance of the Server
 func NewServer() *Server {
-    return &Server{
-        publicMux:     http.NewServeMux(),
-        authorizedMux: http.NewServeMux(),
-    }
+	return &Server{}
 }
 
+// Start starts the HTTP server
 func (s *Server) Start() error {
-    // Register public routes
-    s.publicMux.HandleFunc("/", handler)
+	// Initialize logger
+	logger.Init()
 
-    // Apply middleware for public routes
-    publicHandler := middleware.PublicMiddleware(s.publicMux)
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		logger.Error("Error loading .env file", zap.Error(err))
+	}
 
-    // Apply JWT authorization middleware for authorized routes
-    authorizedHandler := middleware.JWTAuthorizationMiddleware(s.authorizedMux)
+	// Get server address from environment variable
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default port if not provided
+	}
+	addr := fmt.Sprintf(":%s", port)
 
-    // Create a multiplexer for all routes
-    mux := http.NewServeMux()
-    mux.Handle("/", publicHandler)
-    mux.Handle("/api/", authorizedHandler) // Assuming API endpoints need authorization
+	// Create HTTP server instance with middleware
+	s.httpServer = &http.Server{
+		Addr:    addr,
+		Handler: middleware.LoggingMiddleware(http.DefaultServeMux),
+	}
 
-    // Create HTTP server instance
-    s.httpServer = &http.Server{
-        Addr:    ":8080",
-        Handler: middleware.LoggingMiddleware(mux),
-    }
+	// Start the HTTP server in a separate goroutine
+	go func() {
+		logger.Info("Server is starting", zap.String("address", addr))
+		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("Could not start server", zap.Error(err))
+		}
+	}()
 
-    // Start the HTTP server in a goroutine
-    go func() {
-        if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-            panic(err)
-        }
-    }()
+	// Handle graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
 
-    fmt.Println("Server is running on port 8080...")
-    return nil
-}
+	logger.Info("Server is shutting down")
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    switch r.Method {
-    case http.MethodGet:
-        // Handle GET request (e.g., fetch user details)
-    case http.MethodPost:
-        // Handle POST request (e.g., create a new user)
-    case http.MethodPut:
-        // Handle PUT request (e.g., update user details)
-    case http.MethodDelete:
-        // Handle DELETE request (e.g., delete user)
-    default:
-        w.WriteHeader(http.StatusMethodNotAllowed)
-        fmt.Fprintf(w, "Method not allowed")
-    }
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := s.httpServer.Shutdown(ctx); err != nil {
+		logger.Error("Could not gracefully shutdown server", zap.Error(err))
+	}
+
+	logger.Info("Server stopped")
+
+	return nil
 }
