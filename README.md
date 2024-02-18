@@ -60,12 +60,12 @@ make run
 │   │   └── security
 │   │       └── security.go
 │   ├── interfaces
-│   │   ├── controller
-│   │   │   └── user.go
-│   │   ├── middleware
-│   │   │   └── middleware.go
-│   │   └── response
-│   │      └── response.go
+│       ├── controller
+│       │   └── user.go
+│       ├── middleware
+│       │   └── middleware.go
+│       └── response
+│           └── response.go
 ├── Dockerfile
 ├── go.mod
 ├── go.sum
