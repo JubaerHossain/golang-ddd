@@ -20,7 +20,7 @@ func SetupRoutes(cacheService cache.CacheService) *http.ServeMux {
 	// Register monitoring endpoint
 	router.Handle("/metrics", monitor.MetricsHandler())
 	// Add more routes as needed
-	router.Handle("/user", userhttp.SetupUserRoutes(cacheService))
+	router.Handle("/", userhttp.SetupUserRoutes(cacheService))
 
 	return router
 }
