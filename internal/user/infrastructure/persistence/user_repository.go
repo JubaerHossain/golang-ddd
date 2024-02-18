@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"time"
+
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
@@ -46,6 +48,8 @@ func (r *UserRepositoryImpl) GetUserByID(userID uint) (*entity.User, error) {
 // CreateUser saves a new user to the database
 func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error) {
 	// Implement logic to save user
+	user.CreatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
+	user.UpdatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}

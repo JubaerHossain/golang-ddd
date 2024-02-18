@@ -74,7 +74,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Call the CreateUser function to create the user
 	user, err := application.CreateUser(&newUser)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to create user")
 		return
 	}
 

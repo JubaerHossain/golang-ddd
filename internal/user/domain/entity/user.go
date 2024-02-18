@@ -33,7 +33,7 @@ type User struct {
 	Email     string `json:"email" validate:"required,email,max=100"`
 	Password  string `json:"password" validate:"required,min=6,max=20"`
 	Role      Role   `json:"role" gorm:"default:chef" validate:"required,oneof=admin manager waiter chef"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	CreatedAt string `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt string `json:"updated_at" gorm:"autoUpdateTime"`
 	Status    Status `json:"status" gorm:"default:pending" validate:"required,oneof=active inactive deleted pending"`
 }
