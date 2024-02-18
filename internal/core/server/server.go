@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/cache"
+	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/core/routes"
 	"github.com/joho/godotenv"
@@ -35,6 +36,13 @@ func (s *Server) Start() error {
 	// Load environment variables from .env file
 	if err := godotenv.Load(); err != nil {
 		logger.Error("Error loading .env file", zap.Error(err))
+	}
+
+	// Initialize database connection
+	_, err := database.ConnectDB()
+	if err != nil {
+		logger.Error("Failed to connect to database", zap.Error(err))
+		return err
 	}
 
 	// Initialize Redis cache service

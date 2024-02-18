@@ -11,6 +11,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // ConnectDB initializes a connection to the PostgreSQL database
@@ -25,7 +26,9 @@ func ConnectDB() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
 		PreferSimpleProtocol: true, // Disable prepared statements
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
@@ -35,14 +38,9 @@ func ConnectDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database connection pool: %w", err)
 	}
-	sqlDB.SetMaxIdleConns(10)    // Maximum number of idle connections in the pool
-	sqlDB.SetMaxOpenConns(100)   // Maximum number of open connections to the database
-	sqlDB.SetConnMaxLifetime(0)  // Maximum amount of time a connection may be reused
-
-	// Enable database logging
-	if os.Getenv("DATABASE_LOGGING") == "true" {
-		db.Logger.Info(context.Background(), "database logging enabled")
-	}
+	sqlDB.SetMaxIdleConns(10)   // Maximum number of idle connections in the pool
+	sqlDB.SetMaxOpenConns(100)  // Maximum number of open connections to the database
+	sqlDB.SetConnMaxLifetime(0) // Maximum amount of time a connection may be reused
 
 	// Test the database connection
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -64,14 +62,15 @@ func ConnectDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-
 // MigrateDB performs database migration
 func MigrateDB(db *gorm.DB) error {
 	// Add your database migration logic here
 	// For example:
-	// if err := db.AutoMigrate(&User{}); err != nil {
-	//     return err
-	// }
+	if err := db.AutoMigrate(
+	// Add your model structs here
+	); err != nil {
+		return fmt.Errorf("failed to perform database migrations: %w", err)
+	}
 	log.Println("database migration completed")
 	return nil
 }
