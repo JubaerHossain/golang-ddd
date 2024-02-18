@@ -79,7 +79,7 @@ make run
 │   │   │   └── router.go
 │   │   └── security
 │   │       └── security.go
-│   ├── interfaces
+│   └── interfaces
 │       ├── controller
 │       │   └── user.go
 │       ├── middleware
