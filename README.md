@@ -16,3 +16,13 @@ make install
 make dev
 ```
 
+## build the project
+```bash
+make build
+```
+
+## run the project [production mode]
+```bash
+make run
+```
+
