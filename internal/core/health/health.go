@@ -1,5 +1,5 @@
 // Package health_check provides functionality for health checks.
-package health_check
+package health
 
 import (
 	"net/http"

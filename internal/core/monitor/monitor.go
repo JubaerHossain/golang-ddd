@@ -1,6 +1,4 @@
-// File: internal/core/monitoring.go
-
-package monitoring
+package monitor
 
 import (
     "net/http"

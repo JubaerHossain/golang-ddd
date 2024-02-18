@@ -42,9 +42,29 @@ make run
 ## Project Structure
 ```bash
 .
+├── cmd
+│   └── server
+│       └── server.go
 ├── internal
-│   ├── config
-│   │   └── config.go
+│   ├── core
+│   │   └── auth
+│   │       └── auth.go
+│   ├── cache
+│   │   └── cache.go
+│   ├── database
+│   │   └── database.go
+|   ├── errors
+│   │   └── errors.go
+│   ├── health
+│   │   └── health.go
+│   ├── logger
+│   │   └── logger.go
+│   ├── middleware
+│   │   └── auth.middleware.go
+│   ├── monitor
+│   │   └── monitor.go
+│   ├── server
+│   │   └── server.go
 │   ├── domain
 │   │   ├── model
 │   │   │   └── user.go
