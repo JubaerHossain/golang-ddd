@@ -11,7 +11,7 @@ import (
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/cache"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
-	"github.com/JubaerHossain/golang-ddd/internal/core/middleware"
+	"github.com/JubaerHossain/golang-ddd/internal/core/routes"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -52,11 +52,12 @@ func (s *Server) Start() error {
 		port = "8080" // Default port if not provided
 	}
 	addr := fmt.Sprintf(":%s", port)
-
-	// Create HTTP server instance with middleware
+	// Register health check endpoint
+	// Create HTTP server instance with middleware and routes
+	router := routes.SetupRoutes(s.cache)
 	s.httpServer = &http.Server{
 		Addr:    addr,
-		Handler: middleware.LoggingMiddleware(http.DefaultServeMux),
+		Handler: router,
 	}
 
 	// Start the HTTP server in a separate goroutine
