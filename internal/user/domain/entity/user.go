@@ -5,5 +5,9 @@ type User struct {
     ID       uint   `json:"id"`
     Username string `json:"username"`
     Email    string `json:"email"`
-    // Add more fields as needed
+    Password string `json:"password"`
+    Role     string `json:"role"`
+    CreatedAt string `json:"created_at"`
+    UpdatedAt string `json:"updated_at"`
+    Status   string `json:"status"`
 }

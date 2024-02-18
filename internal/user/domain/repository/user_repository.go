@@ -10,3 +10,5 @@ type UserRepository interface {
     UpdateUser(user *entity.User) (*entity.User, error)
     DeleteUser(userID uint) error
 }
+
+

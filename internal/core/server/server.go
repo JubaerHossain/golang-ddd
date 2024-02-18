@@ -44,6 +44,7 @@ func (s *Server) Start() error {
 		logger.Error("Failed to connect to database", zap.Error(err))
 		return err
 	}
+	
 
 	// Initialize Redis cache service
 	ctx := context.Background()

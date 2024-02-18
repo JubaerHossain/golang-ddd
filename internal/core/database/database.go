@@ -56,6 +56,11 @@ func ConnectDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to ping database after multiple attempts: %w", err)
 	}
+	
+	defer func() {
+		dbInstance, _ := db.DB()
+		_ = dbInstance.Close()
+	}()
 
 	log.Println("connected to database")
 
