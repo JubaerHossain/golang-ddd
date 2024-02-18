@@ -42,7 +42,7 @@ make run
 ## Project Structure
 ```bash
 .
-├── app
+├── internal
 │   ├── config
 │   │   └── config.go
 │   ├── domain
@@ -65,8 +65,7 @@ make run
 │   │   ├── middleware
 │   │   │   └── middleware.go
 │   │   └── response
-│   │       └── response.go
-│   └── main.go
+│   │      └── response.go
 ├── Dockerfile
 ├── go.mod
 ├── go.sum
