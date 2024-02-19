@@ -115,20 +115,19 @@ func DeleteUser(r *http.Request) error {
 }
 
 // ChangePassword changes the password of a user
-func ChangePassword(r *http.Request, user *entity.UpdateUser) (*entity.User, error) {
+func ChangePassword(r *http.Request, user *entity.UserPasswordChange) error {
 	// Call repository to change password
 	oldUser, err := GetUserByID(r)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	repo, repoErr := persistence.NewUserRepository()
 	if repoErr != nil {
-		return nil, repoErr
+		return repoErr
 	}
-
-	updateUser, userErr := repo.UpdateUser(oldUser, user)
+	userErr := repo.ChangePassword(oldUser, user)
 	if userErr != nil {
-		return nil, userErr
+		return userErr
 	}
-	return updateUser, nil
+	return nil
 }

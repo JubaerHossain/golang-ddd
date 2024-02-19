@@ -63,7 +63,7 @@ func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error)
 	if err != nil {
 		return nil, err
 	}
-	user.Password =  password
+	user.Password = password
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
@@ -136,4 +136,19 @@ func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) *gorm.
 	}
 
 	return query
+}
+
+// ChangePassword changes the password of a user
+func (r *UserRepositoryImpl) ChangePassword(oldUser *entity.User, user *entity.UserPasswordChange) error {
+	// Implement logic to change password
+	if err := utilQuery.ComparePassword(oldUser.Password, user.OldPassword); err != nil {
+		return err
+
+	}
+	user.NewPassword, _ = utilQuery.HashPassword(user.NewPassword)
+	fmt.Println(user.NewPassword)
+	if err := r.db.Model(&oldUser).Update("password", user.NewPassword).Error; err != nil {
+		return err
+	}
+	return nil
 }

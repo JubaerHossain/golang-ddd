@@ -6,6 +6,7 @@ import (
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/application"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
+	utilQuery "github.com/JubaerHossain/golang-ddd/pkg/query"
 	"github.com/JubaerHossain/golang-ddd/pkg/utils"
 	"go.uber.org/zap"
 )
@@ -31,7 +32,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement CreateUser handler
 	var newUser entity.User
 
-	pareErr := utils.BodyParse(&newUser, w, r, true) // Parse request body and validate it
+	pareErr := utilQuery.BodyParse(&newUser, w, r, true) // Parse request body and validate it
 	if pareErr != nil {
 		return
 	}
@@ -68,7 +69,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement UpdateUser handler
 	var updateUser entity.UpdateUser
-	pareErr := utils.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
+	pareErr := utilQuery.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
 	if pareErr != nil {
 		return
 	}
@@ -101,14 +102,14 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	// Implement ChangePassword handler
-	var updateUser entity.UpdateUser
-	pareErr := utils.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
+	var updateUser entity.UserPasswordChange
+	pareErr := utilQuery.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
 	if pareErr != nil {
 		return
 	}
 
 	// Call the CreateUser function to create the user
-	_, err := application.ChangePassword(r, &updateUser)
+	err := application.ChangePassword(r, &updateUser)
 	if err != nil {
 		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return

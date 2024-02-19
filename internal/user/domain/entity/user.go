@@ -42,13 +42,17 @@ type User struct {
 
 
 
-// ChangePassword represents the change password request
+// updateUser represents the user update request
 type UpdateUser struct {
 	Username string `json:"username" validate:"omitempty,min=3,max=50"`
 	Email    string `json:"email" validate:"omitempty,email,max=100"`
 	Role     Role   `json:"role" gorm:"default:chef" validate:"omitempty,oneof=admin manager waiter chef"`
 	Status   Status `json:"status" gorm:"default:pending" validate:"omitempty,oneof=active inactive deleted pending"`
-	Password string `json:"password" validate:"omitempty,min=6,max=20"`
+}
+
+type UserPasswordChange struct {
+	OldPassword string `json:"old_password" validate:"required,min=6,max=20"`
+	NewPassword string `json:"new_password" validate:"required,min=6,max=20"`
 }
 
 // responseUser represents the user response

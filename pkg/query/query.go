@@ -1,9 +1,14 @@
 package utilQuery
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 
+	"github.com/JubaerHossain/golang-ddd/pkg/utils"
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -39,3 +44,27 @@ func HashPassword(password string) (string, error) {
 	}
 	return string(hp), nil
 }
+
+func ComparePassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
+func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidation bool) error {
+	err := json.NewDecoder(r.Body).Decode(s)
+	if err != nil {
+		utils.WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		return err
+	}
+
+	if isValidation {
+		validate := validator.New()
+		validateErr := validate.Struct(s)
+		fmt.Println(validateErr)
+		if validateErr != nil {
+			utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
+			return validateErr
+		}
+	}
+	return nil
+}
+
