@@ -8,6 +8,7 @@ import (
 
 // SetupUserRoutes initializes and returns the HTTP router with user routes.
 func SetupUserRoutes(router *http.ServeMux) *http.ServeMux {
+
 	router.Handle("GET /users", middleware.LimiterMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(GetUsers))))
 	router.Handle("POST /users", middleware.LimiterMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(CreateUser))))
 	router.Handle("GET /users/{id}", middleware.LimiterMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(GetUserByID))))

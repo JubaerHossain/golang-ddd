@@ -59,6 +59,11 @@ func (r *UserRepositoryImpl) GetUser(userID uint) (*entity.ResponseUser, error) 
 // CreateUser saves a new user to the database
 func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error) {
 	// Implement logic to save user
+	password, err := utilQuery.HashPassword(user.Password)
+	if err != nil {
+		return nil, err
+	}
+	user.Password =  password
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}

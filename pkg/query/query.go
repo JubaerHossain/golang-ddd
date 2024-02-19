@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -28,4 +29,13 @@ func Pagination(query *gorm.DB, queryValues map[string][]string) *gorm.DB {
 
 	return query
 
+}
+
+func HashPassword(password string) (string, error) {
+	bp := []byte(password)
+	hp, err := bcrypt.GenerateFromPassword(bp, bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hp), nil
 }

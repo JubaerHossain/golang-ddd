@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -65,15 +64,15 @@ func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface
 	json.NewEncoder(w).Encode(response)
 }
 
-func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidation bool) {
+func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidation bool) error {
+	fmt.Println("BodyParse")
+	fmt.Println(s)
+	fmt.Println(r.Body)
 	err := json.NewDecoder(r.Body).Decode(s)
+	fmt.Println(err)
 	if err != nil {
-		if err == io.EOF {
-			WriteJSONError(w, http.StatusBadRequest, "Empty request body")
-		} else {
-			WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
-		}
-		return
+		WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		return err
 	}
 
 	if isValidation {
@@ -83,7 +82,8 @@ func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidati
 		if validateErr != nil {
 			fmt.Println("validation error")
 			WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
-			return
+			return validateErr
 		}
 	}
+	return nil
 }

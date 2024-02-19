@@ -12,6 +12,13 @@ import (
 )
 
 func LimiterMiddleware(next http.Handler) http.Handler {
+	is_limit_enabled, err := strconv.ParseBool(os.Getenv("RATE_LIMIT_ENABLED"))
+	if err != nil {
+		is_limit_enabled = false
+	}
+	if !is_limit_enabled {
+		return next
+	}
 	limit, err := strconv.Atoi(os.Getenv("RATE_LIMIT"))
 	if err != nil {
 		limit = 1

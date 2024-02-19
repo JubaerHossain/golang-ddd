@@ -31,7 +31,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement CreateUser handler
 	var newUser entity.User
 
-	utils.BodyParse(&newUser, w, r, true) // Parse request body and validate it
+	pareErr := utils.BodyParse(&newUser, w, r, true) // Parse request body and validate it
+	if pareErr != nil {
+		return
+	}
 
 	// Call the CreateUser function to create the user
 	_, err := application.CreateUser(&newUser)
@@ -64,11 +67,14 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement UpdateUser handler
-	var newUser entity.UpdateUser
-	utils.BodyParse(newUser, w, r, true) // Parse request body and validate it
+	var updateUser entity.UpdateUser
+	pareErr := utils.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
+	if pareErr != nil {
+		return
+	}
 
 	// Call the CreateUser function to create the user
-	_, err := application.UpdateUser(r, &newUser)
+	_, err := application.UpdateUser(r, &updateUser)
 	if err != nil {
 		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
