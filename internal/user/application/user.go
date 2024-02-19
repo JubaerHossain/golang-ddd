@@ -4,7 +4,9 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
 	"github.com/JubaerHossain/golang-ddd/internal/user/infrastructure/persistence"
@@ -41,14 +43,17 @@ func CreateUser(user *entity.User) (*entity.User, error) {
 }
 
 // GetUserByID retrieves a user by ID
-func GetUserByID(ctx context.Context, id uint) (*entity.User, error) {
+func GetUserByID(r *http.Request) (*entity.User, error) {
 	// Call repository to get user by ID
 	repo, err := persistence.NewUserRepository()
 	if err != nil {
 		return nil, err
 	}
-
-	user, err2 := repo.GetUserByID(id)
+	id, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID")
+	}
+	user, err2 := repo.GetUserByID(uint(id))
 	if err2 != nil {
 		return nil, err2
 	}
