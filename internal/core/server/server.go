@@ -63,6 +63,12 @@ func (s *Server) Start() error {
 		port = "8080" // Default port if not provided
 	}
 	addr := fmt.Sprintf(":%s", port)
+	// make it beautiful with emoji
+	fmt.Println("                   ")
+	fmt.Println("                   ")
+	fmt.Println("🚀 Server is starting  🚀   " + "http://localhost" + addr)
+	fmt.Println("                  ")
+	fmt.Println("                  ")
 	// Register health check endpoint
 	// Create HTTP server instance with middleware and routes
 	router := routes.SetupRoutes(s.cache)

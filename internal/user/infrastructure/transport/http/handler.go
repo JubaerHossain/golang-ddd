@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/JubaerHossain/golang-ddd/internal/core/cache"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/application"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
@@ -13,7 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
 	// Implement GetUsers handler
 	queryValues := r.URL.Query() //
 
@@ -33,20 +34,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-type ApiError struct {
-	Field string `json:"field"`
-	Error string `json:"error"`
-}
-
-func msgForTag(tag string) string {
-	switch tag {
-	case "required":
-		return "Field is required"
-	// Add more custom error messages as needed
-	default:
-		return "Invalid value"
-	}
-}
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.WriteJSONError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -83,4 +70,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		"message": "User created successfully",
 		"user":    user,
 	})
+}
+
+func GetUserByID(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
+	// Implement GetUserByID handler
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	// Implement UpdateUser handler
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
+	// Implement DeleteUser handler
 }

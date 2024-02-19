@@ -11,9 +11,10 @@ import (
 func SetupUserRoutes(cacheService cache.CacheService) *http.ServeMux {
 	router := http.NewServeMux()
 	// Register user routes
-	router.HandleFunc("/users", GetUsers)
-	// router.HandleFunc("/user/{id}", GetUserByID).Methods("GET")
-	router.HandleFunc("/user", CreateUser)
+	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) { GetUsers(w, r, cacheService) })
+	router.HandleFunc("GET /user/{id}", func(w http.ResponseWriter, r *http.Request) { GetUserByID(w, r, cacheService) })
+	router.HandleFunc("POST /", func(w http.ResponseWriter, r *http.Request) { CreateUser(w, r) })
+	router.HandleFunc("PUT /user/{id}", func(w http.ResponseWriter, r *http.Request) { UpdateUser(w, r) })
 	// router.HandleFunc("/user/{id}", UpdateUser).Methods("PUT")
 	// router.HandleFunc("/user/{id}", DeleteUser).Methods("DELETE")
 
