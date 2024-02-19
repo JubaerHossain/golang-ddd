@@ -65,5 +65,3 @@ type ResponseUser struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Status    Status    `json:"status"`
 }
-
-

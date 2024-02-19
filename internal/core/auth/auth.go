@@ -1,49 +1,39 @@
 package auth
 
 import (
-	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
-// AuthService defines the interface for authentication service
-type AuthService interface {
-	Authenticate(username, password string) (string, error)
-	VerifyToken(tokenString string) (bool, error)
-}
-
-// JWTAuthService implements AuthService using JWT authentication
-type JWTAuthService struct {
-	// You can add fields here if needed
-}
-
-// NewJWTAuthService creates a new instance of JWTAuthService
-func NewJWTAuthService() *JWTAuthService {
-	return &JWTAuthService{}
-}
-
-// Authenticate verifies the username and password and generates a JWT token
-func (svc *JWTAuthService) Authenticate(username, password string) (string, error) {
-
-	// Implement your authentication logic here
-	// For simplicity, we will just check if the username and password are not empty
-	if username == "" || password == "" {
-		return "", errors.New("username and password are required")
-	}
+func CreateToken(s interface{}) (string, error) {
 
 	// Create the JWT claims
+	jwtTime := os.Getenv("JWT_EXPIRATION")
+	if jwtTime == "" {
+		jwtTime = "24"
+	}
+	expiration, err := strconv.Atoi(jwtTime)
+	if err != nil {
+		expiration = 24
+	}
 	claims := jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"user": s,
+		"exp":  time.Now().Add(time.Hour * time.Duration(expiration)).Unix(), // Token expiration time
 	}
 
 	// Create the JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign the token with a secret key
-	tokenString, err := token.SignedString([]byte("your-secret-key"))
+	secretKey := os.Getenv("JWT_SECRET_KEY")
+	if secretKey == "" {
+		secretKey = "your-secret"
+	}
+	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate JWT token: %v", err)
 	}
@@ -52,7 +42,7 @@ func (svc *JWTAuthService) Authenticate(username, password string) (string, erro
 }
 
 // VerifyToken verifies the JWT token
-func (svc *JWTAuthService) VerifyToken(tokenString string) (bool, error) {
+func VerifyToken(tokenString string) (bool, error) {
 	// Parse the token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Check the signing method

@@ -120,25 +120,3 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		"message": "Password changed successfully",
 	})
 }
-
-func Login(w http.ResponseWriter, r *http.Request) {
-	// Implement Login handler
-	var loginUser entity.LoginUser
-	pareErr := utilQuery.BodyParse(&loginUser, w, r, true) // Parse request body and validate it
-	if pareErr != nil {
-		return
-	}
-
-	// Call the CreateUser function to create the user
-	token, err := application.Login(&loginUser)
-	if err != nil {
-		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Write response
-	utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{
-		"message": "Login successful",
-		"token":   token,
-	})
-}

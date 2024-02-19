@@ -3,7 +3,6 @@ package persistence
 import (
 	"fmt"
 
-	"github.com/JubaerHossain/golang-ddd/internal/core/auth"
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
@@ -152,28 +151,4 @@ func (r *UserRepositoryImpl) ChangePassword(oldUser *entity.User, user *entity.U
 		return err
 	}
 	return nil
-}
-
-// loginUser logs in a user
-func (r *UserRepositoryImpl) Login(loginUser *entity.LoginUser) (*entity.LoginUserResponse, error) {
-	// Implement logic to authenticate user
-	user := &entity.User{}
-	if err := r.db.Where("email = ?", loginUser.Email).First(&user).Error; err != nil {
-		return nil, fmt.Errorf("user not found")
-	}
-	if err := utilQuery.ComparePassword(user.Password, loginUser.Password); err != nil {
-		return nil, err
-	}
-	token, err := auth.CreateToken(user)
-	if err != nil {
-		return nil, err
-	}
-	responseUser := &entity.LoginUserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		Status:   user.Status,
-		Token:    token,
-	}
-	return responseUser, nil
 }

@@ -131,17 +131,3 @@ func ChangePassword(r *http.Request, user *entity.UserPasswordChange) error {
 	}
 	return nil
 }
-
-// Login authenticates a user
-func Login(loginUser *entity.LoginUser) (*entity.LoginUserResponse, error) {
-	// Call repository to authenticate user
-	repo, err := persistence.NewUserRepository()
-	if err != nil {
-		return nil, err
-	}
-	user, userErr := repo.Login(loginUser)
-	if userErr != nil {
-		return nil, userErr
-	}
-	return user, nil
-}
