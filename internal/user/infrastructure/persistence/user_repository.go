@@ -111,8 +111,8 @@ func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) *gorm.
 	if dateRange, ok := queryValues["date_range"]; ok && len(dateRange) > 0 {
 		query = query.Where("created_at BETWEEN ? AND ?", dateRange[0], dateRange[1])
 	}
-	// Order
-	if conditions, ok := queryValues["order"]; ok && len(conditions) > 0 {
+	// orderBy
+	if conditions, ok := queryValues["orderBy"]; ok && len(conditions) > 0 {
 		query = query.Order(conditions[0])
 
 	} else {
