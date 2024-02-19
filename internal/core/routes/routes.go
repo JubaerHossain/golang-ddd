@@ -24,9 +24,9 @@ func SetupRoutes() *http.ServeMux {
 	userHttp.SetupUserRoutes(router)
 
 	// Register a welcome message
-	router.Handle("/", middleware.LoggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router.Handle("/", middleware.LimiterMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{"message": "Welcome to the API"})
-	})))
+	}))))
 
 	return router
 }

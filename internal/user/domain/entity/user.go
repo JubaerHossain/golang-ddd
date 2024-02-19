@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 // Status represents the status of a user
 type Status string
 
@@ -28,12 +30,29 @@ const (
 
 // User represents the user entity
 type User struct {
-	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement;not null"` // Primary key
-	Username  string `json:"username" validate:"required,min=3,max=50"`
-	Email     string `json:"email" validate:"required,email,max=100"`
-	Password  string `json:"password" validate:"required,min=6,max=20"`
-	Role      Role   `json:"role" gorm:"default:chef" validate:"required,oneof=admin manager waiter chef"`
-	CreatedAt string `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt string `json:"updated_at" gorm:"autoUpdateTime"`
-	Status    Status `json:"status" gorm:"default:pending" validate:"required,oneof=active inactive deleted pending"`
+	ID        uint      `json:"id" gorm:"primaryKey;autoIncrement;not null"` // Primary key
+	Username  string    `json:"username" validate:"required,min=3,max=50"`
+	Email     string    `json:"email" validate:"required,email,max=100"`
+	Password  string    `json:"password" validate:"required,min=6,max=20"`
+	Role      Role      `json:"role" gorm:"default:chef" validate:"required,oneof=admin manager waiter chef"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	Status    Status    `json:"status" gorm:"default:pending" validate:"required,oneof=active inactive deleted pending"`
+}
+
+type UpdateUser struct {
+	Username string `json:"username" validate:"omitempty,min=3,max=50"`
+	Email    string `json:"email" validate:"omitempty,email,max=100"`
+	Role     Role   `json:"role" gorm:"default:chef" validate:"omitempty,oneof=admin manager waiter chef"`
+	Status   Status `json:"status" gorm:"default:pending" validate:"omitempty,oneof=active inactive deleted pending"`
+}
+
+type ResponseUser struct {
+	ID        uint      `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Role      Role      `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Status    Status    `json:"status"`
 }

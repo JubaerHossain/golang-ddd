@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
@@ -28,9 +27,9 @@ func NewUserRepository() (*UserRepositoryImpl, error) {
 }
 
 // GetAllUsers returns all users from the database
-func (r *UserRepositoryImpl) GetAllUsers(queryValues map[string][]string) ([]*entity.User, error) {
+func (r *UserRepositoryImpl) GetAllUsers(queryValues map[string][]string) ([]*entity.ResponseUser, error) {
 	// Implement logic to get all users
-	users := []*entity.User{}
+	users := []*entity.ResponseUser{}
 	query := r.FilterUsers(queryValues)                  // Filter
 	paginate := utilQuery.Pagination(query, queryValues) // Pagination
 	if err := paginate.Find(&users).Error; err != nil {
@@ -48,12 +47,18 @@ func (r *UserRepositoryImpl) GetUserByID(userID uint) (*entity.User, error) {
 	}
 	return user, nil
 }
+func (r *UserRepositoryImpl) GetUser(userID uint) (*entity.ResponseUser, error) {
+	// Implement logic to get user by ID
+	user := &entity.ResponseUser{}
+	if err := r.db.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+	return user, nil
+}
 
 // CreateUser saves a new user to the database
 func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error) {
 	// Implement logic to save user
-	user.CreatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
-	user.UpdatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
@@ -61,13 +66,11 @@ func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error)
 }
 
 // UpdateUser updates a user in the database
-func (r *UserRepositoryImpl) UpdateUser(oldUser *entity.User, user *entity.User) (*entity.User, error) {
+func (r *UserRepositoryImpl) UpdateUser(oldUser *entity.User, user *entity.UpdateUser) (*entity.User, error) {
 	// Implement logic to update user
-	user.UpdatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
 	if err := r.db.Model(&oldUser).Updates(user).Error; err != nil {
 		return nil, err
 	}
-
 	updateUser := &entity.User{}
 
 	if err := r.db.First(&updateUser, oldUser.ID).Error; err != nil {
@@ -78,9 +81,9 @@ func (r *UserRepositoryImpl) UpdateUser(oldUser *entity.User, user *entity.User)
 
 // DeleteUser deletes a user from the database
 
-func (r *UserRepositoryImpl) DeleteUser(userID uint) error {
+func (r *UserRepositoryImpl) DeleteUser(user *entity.User) error {
 	// Implement logic to delete user
-	if err := r.db.Delete(&entity.User{}, userID).Error; err != nil {
+	if err := r.db.Delete(user).Error; err != nil {
 		return err
 	}
 	return nil
