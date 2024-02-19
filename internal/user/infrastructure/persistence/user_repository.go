@@ -6,6 +6,7 @@ import (
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
+	utilQuery "github.com/JubaerHossain/golang-ddd/pkg/query"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -26,10 +27,12 @@ func NewUserRepository() (*UserRepositoryImpl, error) {
 }
 
 // GetAllUsers returns all users from the database
-func (r *UserRepositoryImpl) GetAllUsers() ([]*entity.User, error) {
+func (r *UserRepositoryImpl) GetAllUsers(queryValues map[string][]string) ([]*entity.User, error) {
 	// Implement logic to get all users
 	users := []*entity.User{}
-	if err := r.db.Find(&users).Error; err != nil {
+	query := r.FilterUsers(queryValues)                  // Filter
+	paginate := utilQuery.Pagination(query, queryValues) // Pagination
+	if err := paginate.Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil
@@ -75,27 +78,46 @@ func (r *UserRepositoryImpl) DeleteUser(userID uint) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) (users []*entity.User, err error) {
-	// Implement logic to filter users
-	// Example: filter users by name
+func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) *gorm.DB {
+	// Construct base query
 	query := r.db.Model(&entity.User{})
-	if name, ok := queryValues["name"]; ok {
-		query = query.Where("name = ?", name[0])
+
+	// Filter by name
+	if names, ok := queryValues["username"]; ok && len(names) > 0 {
+		query = query.Where("username LIKE ?", "%"+names[0]+"%")
 	}
-	if email, ok := queryValues["email"]; ok {
-		query = query.Where("email = ?", email[0])
+
+	// Filter by email
+	if emails, ok := queryValues["email"]; ok && len(emails) > 0 {
+		query = query.Where("email LIKE ?", "%"+emails[0]+"%")
 	}
-	if status := queryValues["status"]; len(status) > 0 {
-		query = query.Where("status = ?", status[0])
+
+	// Filter by status
+	if statuses, ok := queryValues["status"]; ok && len(statuses) > 0 {
+		query = query.Where("status IN (?)", statuses)
 	}
-	if role := queryValues["role"]; len(role) > 0 {
-		query = query.Where("role = ?", role[0])
+
+	// Filter by role
+	if roles, ok := queryValues["role"]; ok && len(roles) > 0 {
+		query = query.Where("role IN (?)", roles)
 	}
-	if date := queryValues["date"]; len(date) > 0 {
-		query = query.Where("created_at = ?", date[0])
+
+	// Filter by date
+	if dates, ok := queryValues["date"]; ok && len(dates) > 0 {
+		query = query.Where("created_at >= ?", dates[0])
 	}
-	if err := query.Find(&users).Error; err != nil {
-		return nil, err
+
+	// Filter by date range
+	if dateRange, ok := queryValues["date_range"]; ok && len(dateRange) > 0 {
+		query = query.Where("created_at BETWEEN ? AND ?", dateRange[0], dateRange[1])
 	}
-	return users, nil
+	// Order
+	if conditions, ok := queryValues["order"]; ok && len(conditions) > 0 {
+		query = query.Order(conditions[0])
+
+	} else {
+		query = query.Order("created_at desc")
+	}
+
+	return query
 }

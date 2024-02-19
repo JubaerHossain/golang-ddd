@@ -16,9 +16,8 @@ import (
 
 func GetUsers(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
 	// Implement GetUsers handler
-	queryValues := r.URL.Query() //
-
-	users, err := application.GetUsers(queryValues)
+	var users []*entity.User
+	users, err := application.GetUsers(r)
 	if err != nil {
 		logger.Error("Failed to fetch users", zap.Error(err))
 		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to fetch users")

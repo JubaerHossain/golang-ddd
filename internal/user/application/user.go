@@ -4,19 +4,20 @@ package application
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
 	"github.com/JubaerHossain/golang-ddd/internal/user/infrastructure/persistence"
 )
 
-func GetUsers(ctx context.Context) ([]*entity.User, error) {
+func GetUsers(r *http.Request) ([]*entity.User, error) {
 	// Call repository to get all users
+	queryValues := r.URL.Query()
 	repo, err := persistence.NewUserRepository()
 	if err != nil {
 		return nil, err
 	}
-
-	users, err2 := repo.GetAllUsers()
+	users, err2 := repo.GetAllUsers(queryValues)
 	if err2 != nil {
 		return nil, err2
 	}
@@ -81,21 +82,6 @@ func DeleteUser(ctx context.Context, id uint) error {
 	if err2 != nil {
 		return err2
 	}
-
-	return nil
-}
-
-func filterUser(ctx context.Context, status_id string) error {
-	// Call repository to delete user
-	_, err := persistence.NewUserRepository()
-	if err != nil {
-		return err
-	}
-
-	// err2 := repo.FilterUser(status_id)
-	// if err2 != nil {
-	// 	return err2
-	// }
 
 	return nil
 }
