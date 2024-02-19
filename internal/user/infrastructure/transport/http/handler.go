@@ -80,6 +80,6 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement UpdateUser handler
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	// Implement DeleteUser handler
 }

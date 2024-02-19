@@ -15,10 +15,7 @@ func SetupUserRoutes(cacheService cache.CacheService) *http.ServeMux {
 	router.HandleFunc("GET /user/{id}", func(w http.ResponseWriter, r *http.Request) { GetUserByID(w, r, cacheService) })
 	router.HandleFunc("POST /", func(w http.ResponseWriter, r *http.Request) { CreateUser(w, r) })
 	router.HandleFunc("PUT /user/{id}", func(w http.ResponseWriter, r *http.Request) { UpdateUser(w, r) })
-	// router.HandleFunc("/user/{id}", UpdateUser).Methods("PUT")
-	// router.HandleFunc("/user/{id}", DeleteUser).Methods("DELETE")
-
-	// Add more user routes as needed
+	router.HandleFunc("DELETE /user/{id}", func(w http.ResponseWriter, r *http.Request) { DeleteUser(w, r) })
 
 	return router
 }
