@@ -18,19 +18,17 @@ func GetUsers(w http.ResponseWriter, r *http.Request, cacheService cache.CacheSe
 	// Implement GetUsers handler
 	queryValues := r.URL.Query() //
 
-	logger.Info("GetUsers handler called")
-
-	logger.Info("GetUsers handler called", zap.String("queryValues", queryValues.Encode()))
-
-	// users , err := application.GetUsers(queryValues)
-	// if err != nil {
-	// 	// Handle error
-	// }
+	users, err := application.GetUsers(queryValues)
+	if err != nil {
+		logger.Error("Failed to fetch users", zap.Error(err))
+		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to fetch users")
+		return
+	}
 
 	// Write response
 	utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{
 		"message": "Users fetched successfully",
-		"users":   []interface{}{}, // Placeholder for user data
+		"users":   users,
 	})
 }
 
@@ -52,9 +50,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// fmt.Println("newUser", newUser)
 	validate := validator.New()
-	err3 := validate.Struct(newUser)
-	if err3 != nil {
-		utils.WriteJSONEValidation(w, http.StatusBadRequest, err3.(validator.ValidationErrors))
+	validateErr := validate.Struct(newUser)
+	if validateErr != nil {
+		utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
 		return
 	}
 
