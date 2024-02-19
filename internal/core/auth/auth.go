@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/JubaerHossain/golang-ddd/internal/category/domain/entity"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -60,8 +61,8 @@ func VerifyToken(tokenString string) (bool, error) {
 	// Check if the token is valid
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Optionally, you can perform additional validation on claims here
-		username := claims["username"].(string)
-		fmt.Printf("Token is valid for user: %s\n", username)
+		user := claims["user"].(entity.User)
+		fmt.Println(user)
 		return true, nil
 	}
 
