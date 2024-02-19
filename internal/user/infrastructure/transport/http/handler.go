@@ -98,3 +98,24 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		"message": "User deleted successfully",
 	})
 }
+
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	// Implement ChangePassword handler
+	var updateUser entity.UpdateUser
+	pareErr := utils.BodyParse(&updateUser, w, r, true) // Parse request body and validate it
+	if pareErr != nil {
+		return
+	}
+
+	// Call the CreateUser function to create the user
+	_, err := application.ChangePassword(r, &updateUser)
+	if err != nil {
+		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Write response
+	utils.WriteJSONResponse(w, http.StatusCreated, map[string]interface{}{
+		"message": "Password changed successfully",
+	})
+}
