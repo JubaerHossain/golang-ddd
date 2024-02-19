@@ -61,18 +61,22 @@ func GetUserByID(r *http.Request) (*entity.User, error) {
 }
 
 // UpdateUser updates an existing user
-func UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
+func UpdateUser(r *http.Request,  user *entity.User) (*entity.User, error) {
 	// Call repository to update user
+	oldUser, err := GetUserByID(r)
+	if err != nil {
+		return nil, err
+	}
 	repo, err := persistence.NewUserRepository()
 	if err != nil {
 		return nil, err
 	}
 
-	user, err2 := repo.UpdateUser(user)
+	updateUser, err2 := repo.UpdateUser(oldUser, user)
 	if err2 != nil {
 		return nil, err2
 	}
-	return user, nil
+	return updateUser, nil
 }
 
 // DeleteUser deletes a user by ID

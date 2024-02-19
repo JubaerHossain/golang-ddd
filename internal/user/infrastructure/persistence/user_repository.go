@@ -61,12 +61,19 @@ func (r *UserRepositoryImpl) CreateUser(user *entity.User) (*entity.User, error)
 }
 
 // UpdateUser updates a user in the database
-func (r *UserRepositoryImpl) UpdateUser(user *entity.User) (*entity.User, error) {
+func (r *UserRepositoryImpl) UpdateUser(oldUser *entity.User, user *entity.User) (*entity.User, error) {
 	// Implement logic to update user
-	if err := r.db.Save(user).Error; err != nil {
+	user.UpdatedAt = string(time.Now().Format("2006-01-02 15:04:05"))
+	if err := r.db.Model(&oldUser).Updates(user).Error; err != nil {
 		return nil, err
 	}
-	return user, nil
+
+	updateUser := &entity.User{}
+
+	if err := r.db.First(&updateUser, oldUser.ID).Error; err != nil {
+		return nil, err
+	}
+	return updateUser, nil
 }
 
 // DeleteUser deletes a user from the database

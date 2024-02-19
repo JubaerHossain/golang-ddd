@@ -1,16 +1,12 @@
 package userhttp
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/application"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
 	"github.com/JubaerHossain/golang-ddd/pkg/utils"
-	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
@@ -32,24 +28,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	// Implement CreateUser handler
 	var newUser entity.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
-	if err != nil {
-		if err == io.EOF {
-			utils.WriteJSONError(w, http.StatusBadRequest, "Empty request body")
-		} else {
-			utils.WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
-		}
-		return
-	}
 
-	// fmt.Println("newUser", newUser)
-	validate := validator.New()
-	validateErr := validate.Struct(newUser)
-	if validateErr != nil {
-		utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
-		return
-	}
+	utils.BodyParse(&newUser, w, r, true) // Parse request body and validate it
 
 	// Call the CreateUser function to create the user
 	user, err := application.CreateUser(&newUser)
@@ -83,32 +65,13 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement UpdateUser handler
-
-	fmt.Println("UpdateUser")
-
 	var newUser entity.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
-	if err != nil {
-		if err == io.EOF {
-			utils.WriteJSONError(w, http.StatusBadRequest, "Empty request body")
-		} else {
-			utils.WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
-		}
-		return
-	}
-
-	// fmt.Println("newUser", newUser)
-	validate := validator.New()
-	validateErr := validate.Struct(newUser)
-	if validateErr != nil {
-		utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
-		return
-	}
+	utils.BodyParse(newUser, w, r, true) // Parse request body and validate it
 
 	// Call the CreateUser function to create the user
-	user, err := application.UpdateUser(&newUser)
+	user, err := application.UpdateUser(r, &newUser)
 	if err != nil {
-		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to create user")
+		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

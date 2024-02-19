@@ -2,6 +2,8 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -48,7 +50,7 @@ func WriteJSONError(w http.ResponseWriter, statusCode int, message string) {
 func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface{}) {
 	errors := make(map[string]string)
 	for _, err := range error.(validator.ValidationErrors) {
-		if strings.ToLower(err.Field()) != ""{			
+		if strings.ToLower(err.Field()) != "" {
 			errors[strings.ToLower(err.Field())] = err.Field() + " is " + err.Tag()
 		}
 	}
@@ -61,4 +63,27 @@ func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(response)
+}
+
+func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidation bool) {
+	err := json.NewDecoder(r.Body).Decode(s)
+	if err != nil {
+		if err == io.EOF {
+			WriteJSONError(w, http.StatusBadRequest, "Empty request body")
+		} else {
+			WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		}
+		return
+	}
+
+	if isValidation {
+		validate := validator.New()
+		validateErr := validate.Struct(s)
+		fmt.Println(validateErr)
+		if validateErr != nil {
+			fmt.Println("validation error")
+			WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
+			return
+		}
+	}
 }
