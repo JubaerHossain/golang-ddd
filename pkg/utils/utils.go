@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -48,9 +47,7 @@ func WriteJSONError(w http.ResponseWriter, statusCode int, message string) {
 func WriteJSONEValidation(w http.ResponseWriter, statusCode int, error interface{}) {
 	errors := make(map[string]string)
 	for _, err := range error.(validator.ValidationErrors) {
-		if strings.ToLower(err.Field()) != "" {
-			errors[strings.ToLower(err.Field())] = err.Field() + " is " + err.Tag()
-		}
+		errors[err.Field()] = err.Field() + " is " + err.Tag() + " " + err.Param()
 	}
 	response := ErrorResponse{
 		Success: false,

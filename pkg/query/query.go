@@ -2,7 +2,6 @@ package utilQuery
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -59,7 +58,6 @@ func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidati
 	if isValidation {
 		validate := validator.New()
 		validateErr := validate.Struct(s)
-		fmt.Println(validateErr)
 		if validateErr != nil {
 			utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
 			return validateErr
@@ -67,4 +65,3 @@ func BodyParse(s interface{}, w http.ResponseWriter, r *http.Request, isValidati
 	}
 	return nil
 }
-
