@@ -12,7 +12,6 @@ import (
 
 // SetupRoutes initializes and returns the HTTP router with all routes.
 func SetupRoutes() *http.ServeMux {
-
 	router := http.NewServeMux()
 
 	// Register health check endpoint
@@ -20,7 +19,8 @@ func SetupRoutes() *http.ServeMux {
 
 	// Register monitoring endpoint
 	router.Handle("GET /metrics", monitor.MetricsHandler())
-	// Add more routes as needed
+
+	// register user routes
 	userHttp.SetupUserRoutes(router)
 
 	// Register a welcome message
