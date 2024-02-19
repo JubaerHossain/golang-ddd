@@ -69,11 +69,9 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	var user *entity.User
 	user, err := application.GetUserByID(r)
 	if err != nil {
-		logger.Error("Failed to fetch users", zap.Error(err))
-		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to fetch users")
+		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	// Write response
 	utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{
 		"message": "User fetched successfully",

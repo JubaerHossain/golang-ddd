@@ -53,9 +53,9 @@ func GetUserByID(r *http.Request) (*entity.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid user ID")
 	}
-	user, err2 := repo.GetUserByID(uint(id))
-	if err2 != nil {
-		return nil, err2
+	user, userErr := repo.GetUserByID(uint(id))
+	if userErr != nil {
+		return nil, userErr
 	}
 	return user, nil
 }

@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
@@ -43,7 +44,7 @@ func (r *UserRepositoryImpl) GetUserByID(userID uint) (*entity.User, error) {
 	// Implement logic to get user by ID
 	user := &entity.User{}
 	if err := r.db.First(&user, userID).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("user not found")
 	}
 	return user, nil
 }
