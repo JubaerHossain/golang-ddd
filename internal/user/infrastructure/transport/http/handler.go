@@ -2,6 +2,7 @@ package userhttp
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -82,6 +83,40 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Implement UpdateUser handler
+
+	fmt.Println("UpdateUser")
+
+	var newUser entity.User
+	err := json.NewDecoder(r.Body).Decode(&newUser)
+	if err != nil {
+		if err == io.EOF {
+			utils.WriteJSONError(w, http.StatusBadRequest, "Empty request body")
+		} else {
+			utils.WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		}
+		return
+	}
+
+	// fmt.Println("newUser", newUser)
+	validate := validator.New()
+	validateErr := validate.Struct(newUser)
+	if validateErr != nil {
+		utils.WriteJSONEValidation(w, http.StatusBadRequest, validateErr.(validator.ValidationErrors))
+		return
+	}
+
+	// Call the CreateUser function to create the user
+	user, err := application.UpdateUser(&newUser)
+	if err != nil {
+		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to create user")
+		return
+	}
+
+	// Write response
+	utils.WriteJSONResponse(w, http.StatusCreated, map[string]interface{}{
+		"message": "User updated successfully",
+		"user":    user,
+	})
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
