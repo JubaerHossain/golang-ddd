@@ -130,15 +130,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call the CreateUser function to create the user
-	token, err := application.Login(&loginUser)
+	user, err := application.Login(&loginUser)
 	if err != nil {
 		utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	// Write response
-	utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{
-		"message": "Login successful",
-		"token":   token,
-	})
+	utils.ReturnResponse(w, http.StatusOK,"Login successful",user)
 }

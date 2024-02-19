@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/crypto v0.19.0
 	gorm.io/gorm v1.25.7-0.20240204074919-46816ad31dde
 )
 
@@ -30,7 +31,6 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
 )
 
 require (

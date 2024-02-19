@@ -20,6 +20,17 @@ type ErrorResponse struct {
 	Errors  interface{} `json:"errors,omitempty"`
 }
 
+func ReturnResponse(w http.ResponseWriter, statusCode int, message string, data interface{}) {
+	response := Response{
+		Success: statusCode >= 200 && statusCode < 300,
+		Message: message,
+		Data:    data,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(response)
+}
+
 // WriteJSONResponse writes a JSON response with the specified status code.
 func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
 	response := Response{

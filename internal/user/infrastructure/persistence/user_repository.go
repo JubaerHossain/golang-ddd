@@ -162,18 +162,18 @@ func (r *UserRepositoryImpl) Login(loginUser *entity.LoginUser) (*entity.LoginUs
 		return nil, fmt.Errorf("user not found")
 	}
 	if err := utilQuery.ComparePassword(user.Password, loginUser.Password); err != nil {
-		return nil, err
+		return nil,  err
 	}
 	token, err := auth.CreateToken(user)
 	if err != nil {
-		return nil, err
+		return nil,  err
 	}
-	responseUser := &entity.LoginUserResponse{
+	responseTokenUser := &entity.LoginUserResponse{
 		ID:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 		Status:   user.Status,
-		Token:    token,
+		Token: token,
 	}
-	return responseUser, nil
+	return responseTokenUser, nil
 }
