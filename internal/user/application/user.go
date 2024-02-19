@@ -17,9 +17,9 @@ func GetUsers(r *http.Request) ([]*entity.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	users, err2 := repo.GetAllUsers(queryValues)
-	if err2 != nil {
-		return nil, err2
+	users, userErr := repo.GetAllUsers(queryValues)
+	if userErr != nil {
+		return nil, userErr
 	}
 	return users, nil
 }

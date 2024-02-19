@@ -44,8 +44,8 @@ func (s *Server) Start() error {
 		logger.Error("Failed to connect to database", zap.Error(err))
 		return err
 	}
-	if  os.Getenv("MIGRATE") == "true" {
-		database.MigrateDB(db)	
+	if os.Getenv("MIGRATE") == "true" {
+		database.MigrateDB(db)
 	}
 
 	// Initialize Redis cache service
@@ -71,7 +71,7 @@ func (s *Server) Start() error {
 	fmt.Println("                  ")
 	// Register health check endpoint
 	// Create HTTP server instance with middleware and routes
-	router := routes.SetupRoutes(s.cache)
+	router := routes.SetupRoutes()
 	s.httpServer = &http.Server{
 		Addr:    addr,
 		Handler: router,

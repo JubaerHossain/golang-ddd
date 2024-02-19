@@ -2,10 +2,10 @@ package userhttp
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
-	"github.com/JubaerHossain/golang-ddd/internal/core/cache"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/application"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
@@ -14,7 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
+func GetUsers(w http.ResponseWriter, r *http.Request) {
 	// Implement GetUsers handler
 	var users []*entity.User
 	users, err := application.GetUsers(r)
@@ -32,10 +32,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request, cacheService cache.CacheSe
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.WriteJSONError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
 	var newUser entity.User
 	err := json.NewDecoder(r.Body).Decode(&newUser)
 	if err != nil {
@@ -69,8 +65,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func GetUserByID(w http.ResponseWriter, r *http.Request, cacheService cache.CacheService) {
+func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	// Implement GetUserByID handler
+	fmt.Println("GetUserByID")
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
