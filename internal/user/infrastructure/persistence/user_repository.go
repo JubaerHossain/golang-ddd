@@ -164,6 +164,7 @@ func (r *UserRepositoryImpl) Login(loginUser *entity.LoginUser) (*entity.LoginUs
 	if err := utilQuery.ComparePassword(user.Password, loginUser.Password); err != nil {
 		return nil,  fmt.Errorf("invalid password")
 	}
+	fmt.Println(user)
 	token, err := auth.CreateToken(user)
 	if err != nil {
 		return nil,  err

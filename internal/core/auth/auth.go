@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/JubaerHossain/golang-ddd/internal/category/domain/entity"
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func CreateToken(s interface{}) (string, error) {
-
+func CreateToken(payload interface{}) (string, error) {
 	// Create the JWT claims
 	jwtTime := os.Getenv("JWT_EXPIRATION")
 	if jwtTime == "" {
@@ -21,8 +21,11 @@ func CreateToken(s interface{}) (string, error) {
 	if err != nil {
 		expiration = 24
 	}
+
+	fmt.Println(payload)
+
 	claims := jwt.MapClaims{
-		"user": s,
+		"user": payload,
 		"exp":  time.Now().Add(time.Hour * time.Duration(expiration)).Unix(), // Token expiration time
 	}
 
@@ -43,28 +46,46 @@ func CreateToken(s interface{}) (string, error) {
 }
 
 // VerifyToken verifies the JWT token
-func VerifyToken(tokenString string) (bool, error) {
+func VerifyToken(tokenString string) (bool, *entity.AuthUser, error) {
+	// Remove the "Bearer " prefix from the token string
+	tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 	// Parse the token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Check the signing method
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
 		// Return the secret key
-		return []byte("your-secret-key"), nil
+		secretKey := os.Getenv("JWT_SECRET_KEY")
+		if secretKey == "" {
+			secretKey = "your-secret"
+		}
+		return []byte(secretKey), nil
 	})
 
 	if err != nil {
-		return false, fmt.Errorf("failed to parse token: %v", err)
+		return false, nil, fmt.Errorf("failed to parse token: %v", err)
 	}
 
 	// Check if the token is valid
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// Optionally, you can perform additional validation on claims here
-		user := claims["user"].(entity.User)
-		fmt.Println(user)
-		return true, nil
+		// Extract user information from claims
+		if userClaim, exists := claims["user"]; exists {
+			// Extract user information from claims
+			if userData, ok := userClaim.(map[string]interface{}); ok {
+				// Deserialize user data from the map
+				user := entity.AuthUser{
+					ID:       uint(int(userData["id"].(float64))),
+					Username: userData["username"].(string),
+					Email:    userData["email"].(string),
+					Role:     entity.Role(userData["role"].(string)),
+					Status:   entity.Status(userData["status"].(string)),
+				}
+				return true, &user, nil
+			}
+		}
 	}
 
-	return false, nil
+	return false, nil, nil
 }

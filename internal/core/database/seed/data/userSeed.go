@@ -6,7 +6,6 @@ import (
 	"github.com/JubaerHossain/golang-ddd/internal/category/domain/entity"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	utilQuery "github.com/JubaerHossain/golang-ddd/pkg/query"
-	"github.com/bxcodec/faker/v3"
 	"gorm.io/gorm"
 )
 
@@ -22,8 +21,8 @@ func SeedUsers(db *gorm.DB, numUsers int) error {
 	for _, role := range roles {
 		for i := 0; i < numUsers; i++ {
 			var user entity.User
-			user.Username = faker.Username()
-			user.Email = string(role) + "@example.com"
+			user.Username = string(role)
+			user.Email = string(role) + "@gmail.com"
 			user.Password = password
 			user.Role = role
 			user.CreatedAt = time.Now()

@@ -65,3 +65,11 @@ type ResponseUser struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Status    Status    `json:"status"`
 }
+
+type AuthUser struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     Role   `json:"role"`
+	Status   Status `json:"status"`
+}

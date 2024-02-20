@@ -1,36 +1,39 @@
 package middleware
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 
 	"github.com/JubaerHossain/golang-ddd/internal/core/auth"
-	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/pkg/utils"
-	"go.uber.org/zap"
 )
 
 func Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		// Check if the request is authenticated
-		// If not, return an unauthorized response
-		// Otherwise, call the next handler
-		// For now, we will just call the next handler
 		token := r.Header.Get("Authorization")
 		if token == "" {
-			utils.WriteJSONError(w, http.StatusUnauthorized, "Unauthorized")
+			utils.WriteJSONError(w, http.StatusUnauthorized, "Unauthorized: missing token")
 			return
 		}
 
-		_, err := auth.VerifyToken(token)
+		// Verify the token
+		isValid, user, err := auth.VerifyToken(token)
 		if err != nil {
-			logger.Error("Failed to verify token", zap.Error(err))
-			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprintf(w, "Unauthorized")
+			utils.WriteJSONError(w, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 			return
 		}
-		next.ServeHTTP(w, r)
+		if !isValid {
+			utils.WriteJSONError(w, http.StatusUnauthorized, "Unauthorized: invalid token")
+			return
+		}
 
+		// Add the authenticated user to the request context
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, "user", user)
+		r = r.WithContext(ctx)
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
 	})
 }
