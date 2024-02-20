@@ -20,6 +20,13 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to fetch users")
 		return
 	}
+	// user, err := auth.User(r)
+	// if err != nil {
+	// 	utils.WriteJSONError(w, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// fmt.Println("user")
+	// fmt.Println(user)
 
 	// Write response
 	utils.WriteJSONResponse(w, http.StatusOK, map[string]interface{}{
@@ -137,5 +144,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Write response
-	utils.ReturnResponse(w, http.StatusOK,"Login successful",user)
+	utils.ReturnResponse(w, http.StatusOK, "Login successful", user)
 }

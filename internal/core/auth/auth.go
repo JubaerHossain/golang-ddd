@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -88,4 +89,12 @@ func VerifyToken(tokenString string) (bool, *entity.AuthUser, error) {
 	}
 
 	return false, nil, nil
+}
+
+func User(r *http.Request) (*entity.AuthUser, error) {
+	user, ok := r.Context().Value("user").(*entity.AuthUser)
+	if !ok {
+		return nil, fmt.Errorf("user not found")
+	}
+	return user, nil
 }
