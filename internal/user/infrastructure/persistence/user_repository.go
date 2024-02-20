@@ -7,6 +7,7 @@ import (
 	"github.com/JubaerHossain/golang-ddd/internal/core/database"
 	"github.com/JubaerHossain/golang-ddd/internal/core/logger"
 	"github.com/JubaerHossain/golang-ddd/internal/user/domain/entity"
+	"github.com/JubaerHossain/golang-ddd/internal/user/domain/repository"
 	utilQuery "github.com/JubaerHossain/golang-ddd/pkg/query"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -18,7 +19,7 @@ type UserRepositoryImpl struct {
 }
 
 // NewUserRepository returns a new instance of UserRepositoryImpl
-func NewUserRepository() (*UserRepositoryImpl, error) {
+func NewUserRepository() (repository.UserRepository, error) {
 	conn, err := database.ConnectDB()
 	if err != nil {
 		logger.Error("Failed to connect to database", zap.Error(err))
@@ -31,7 +32,44 @@ func NewUserRepository() (*UserRepositoryImpl, error) {
 func (r *UserRepositoryImpl) GetAllUsers(queryValues map[string][]string) ([]*entity.ResponseUser, error) {
 	// Implement logic to get all users
 	users := []*entity.ResponseUser{}
-	query := r.FilterUsers(queryValues)                  // Filter
+	query := r.db.Model(&entity.User{})
+
+	// Filter by name
+	if names, ok := queryValues["username"]; ok && len(names) > 0 {
+		query = query.Where("username LIKE ?", "%"+names[0]+"%")
+	}
+
+	// Filter by email
+	if emails, ok := queryValues["email"]; ok && len(emails) > 0 {
+		query = query.Where("email LIKE ?", "%"+emails[0]+"%")
+	}
+
+	// Filter by status
+	if statuses, ok := queryValues["status"]; ok && len(statuses) > 0 {
+		query = query.Where("status IN (?)", statuses)
+	}
+
+	// Filter by role
+	if roles, ok := queryValues["role"]; ok && len(roles) > 0 {
+		query = query.Where("role IN (?)", roles)
+	}
+
+	// Filter by date
+	if dates, ok := queryValues["date"]; ok && len(dates) > 0 {
+		query = query.Where("created_at >= ?", dates[0])
+	}
+
+	// Filter by date range
+	if dateRange, ok := queryValues["date_range"]; ok && len(dateRange) > 0 {
+		query = query.Where("created_at BETWEEN ? AND ?", dateRange[0], dateRange[1])
+	}
+	// orderBy
+	if conditions, ok := queryValues["orderBy"]; ok && len(conditions) > 0 {
+		query = query.Order(conditions[0])
+
+	} else {
+		query = query.Order("created_at desc")
+	} // Filter
 	paginate := utilQuery.Pagination(query, queryValues) // Pagination
 	if err := paginate.Find(&users).Error; err != nil {
 		return nil, err
@@ -93,50 +131,6 @@ func (r *UserRepositoryImpl) DeleteUser(user *entity.User) error {
 		return err
 	}
 	return nil
-}
-
-func (r *UserRepositoryImpl) FilterUsers(queryValues map[string][]string) *gorm.DB {
-	// Construct base query
-	query := r.db.Model(&entity.User{})
-
-	// Filter by name
-	if names, ok := queryValues["username"]; ok && len(names) > 0 {
-		query = query.Where("username LIKE ?", "%"+names[0]+"%")
-	}
-
-	// Filter by email
-	if emails, ok := queryValues["email"]; ok && len(emails) > 0 {
-		query = query.Where("email LIKE ?", "%"+emails[0]+"%")
-	}
-
-	// Filter by status
-	if statuses, ok := queryValues["status"]; ok && len(statuses) > 0 {
-		query = query.Where("status IN (?)", statuses)
-	}
-
-	// Filter by role
-	if roles, ok := queryValues["role"]; ok && len(roles) > 0 {
-		query = query.Where("role IN (?)", roles)
-	}
-
-	// Filter by date
-	if dates, ok := queryValues["date"]; ok && len(dates) > 0 {
-		query = query.Where("created_at >= ?", dates[0])
-	}
-
-	// Filter by date range
-	if dateRange, ok := queryValues["date_range"]; ok && len(dateRange) > 0 {
-		query = query.Where("created_at BETWEEN ? AND ?", dateRange[0], dateRange[1])
-	}
-	// orderBy
-	if conditions, ok := queryValues["orderBy"]; ok && len(conditions) > 0 {
-		query = query.Order(conditions[0])
-
-	} else {
-		query = query.Order("created_at desc")
-	}
-
-	return query
 }
 
 // ChangePassword changes the password of a user
