@@ -1,5 +1,7 @@
 install:
 	go mod tidy
+seed:
+	go run ./cmd/seed/seed.go
 dev:
 	go run ./cmd/server/server.go
 
